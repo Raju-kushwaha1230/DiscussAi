@@ -1,0 +1,194 @@
+import { Eye, EyeOff, Loader2, Zap, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [showPwd, setShowPwd] = useState(false);
+  const [apiError, setApiError] = useState('');
+
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email('Enter a valid email address.')
+      .required('Email is required.'),
+    password: Yup.string()
+      .min(6, 'Password must be at least 6 characters.')
+      .required('Password is required.'),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      remember: true,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      setApiError('');
+      const result = await login(values.email, values.password);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setApiError(result.message || 'Invalid email or password');
+      }
+    },
+  });
+
+  return (
+    <div className="auth-page">
+      {/* ── Left brand panel (md+) ── */}
+      <div className="auth-left">
+        <div className="hero-blob blob-1 animate-float-slow" style={{top: '-8rem', left: '-8rem', opacity: 0.2}} />
+        <div className="hero-blob blob-2 animate-float-slow" style={{bottom: '-10rem', right: '-8rem', opacity: 0.2, animationDelay: '-5s'}} />
+
+        {/* Floating icon */}
+        <div className="animate-float glow-border" style={{
+          position: 'relative', zIndex: 10, width: '7.5rem', height: '7.5rem', borderRadius: '2rem',
+          background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem',
+          marginBottom: '3rem', boxShadow: '0 30px 60px rgba(99, 102, 241, 0.4)', border: '1px solid rgba(255, 255, 255, 0.15)'
+        }}>
+          💬
+        </div>
+
+        <div className="relative z-10 text-center" style={{maxWidth: '380px', padding: '0 2rem'}}>
+          <h2 className="auth-title">
+            Welcome back to <span className="gradient-text">DiscussAI</span>
+          </h2>
+          <p className="auth-sub" style={{marginTop: '1rem', fontSize: '1rem'}}>
+            Your AI peers are waiting for another round of debate. Jump right back in!
+          </p>
+
+          {/* Testimonial */}
+          <div className="feature-card" style={{padding: '1.75rem', marginTop: '3rem', textAlign: 'left', position: 'relative', overflow: 'hidden', background: 'rgba(255,255,255,0.03)'}}>
+            <div className="hero-blob" style={{top: 0, right: 0, width: '10rem', height: '10rem', background: 'var(--primary)', opacity: 0.08, filter: 'blur(50px)'}} />
+            <p style={{color: 'rgba(226, 232, 240, 0.95)', fontSize: '0.95rem', lineHeight: 1.8, fontStyle: 'italic', position: 'relative', zIndex: 10}}>
+              "The AI responses are incredibly high-quality. It really helps me sharpen my arguments before real-world discussions."
+            </p>
+            <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', position: 'relative', zIndex: 10}}>
+              <div style={{
+                width: '2.75rem', height: '2.75rem', borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.9rem', color: 'white', border: '2px solid rgba(255,255,255,0.1)'
+              }}>
+                R
+              </div>
+              <div>
+                <div style={{fontWeight: 800, fontSize: '0.95rem', color: '#f8fafc'}}>Riya Sharma</div>
+                <div style={{fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.125rem'}}>Senior Developer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right form panel ── */}
+      <div className="auth-right">
+        <div className="hero-blob blob-1 animate-float-slow" style={{top: '10%', right: '10%', opacity: 0.04}} />
+
+        <div className="auth-card animate-slide-right glow-border" style={{background: 'var(--bg-surface)', padding: '2.5rem', borderRadius: '1.5rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'}}>
+          {/* Logo mobile */}
+          <Link to="/" className="logo-mobile logo">
+            <div className="logo-icon">💬</div>
+            <span className="logo-text">Discuss<span className="gradient-text">AI</span></span>
+          </Link>
+
+          <h1 className="auth-title">Sign In</h1>
+          <p className="auth-sub">
+             Enter your credentials to access your account. <Link to="/register" className="auth-link">Need an account?</Link>
+          </p>
+
+          {apiError && (
+            <div className="form-error-msg" style={{ marginBottom: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              <Zap size={14} /> {apiError}
+            </div>
+          )}
+
+          <form onSubmit={formik.handleSubmit} noValidate className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email Address</label>
+              <input 
+                id="email" 
+                name="email" 
+                type="email" 
+                placeholder="john@example.com" 
+                value={formik.values.email} 
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`auth-input ${formik.touched.email && formik.errors.email ? 'auth-input-error' : ''}`} 
+              />
+              {formik.touched.email && formik.errors.email && <p className="form-error-msg"><Zap size={12} /> {formik.errors.email}</p>}
+            </div>
+
+            <div className="form-group">
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem'}}>
+                <label htmlFor="password" className="form-label" style={{marginBottom: 0}}>Password</label>
+                <Link to="/forget-password" title="Recover password" style={{fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none'}}>
+                   Forgot Password?
+                </Link>
+              </div>
+              <div className="auth-input-container">
+                <input 
+                  id="password" 
+                  name="password" 
+                  type={showPwd ? 'text' : 'password'} 
+                  placeholder="••••••••"
+                  value={formik.values.password} 
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`auth-input ${formik.touched.password && formik.errors.password ? 'auth-input-error' : ''}`} 
+                  style={{paddingRight: '3.5rem'}} 
+                />
+                <button type="button" onClick={() => setShowPwd((p) => !p)} className="input-icon-btn">
+                  {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {formik.touched.password && formik.errors.password && <p className="form-error-msg"><Zap size={12} /> {formik.errors.password}</p>}
+            </div>
+
+            <div className="auth-footer-links" style={{marginTop: '0.5rem'}}>
+               <div className="auth-checkbox-group" onClick={() => formik.setFieldValue('remember', !formik.values.remember)}>
+                  <input type="checkbox" checked={formik.values.remember} readOnly className="auth-checkbox" />
+                  <span style={{fontSize: '0.9rem', color: '#94a3b8', fontWeight: 500}}>Remember me</span>
+               </div>
+            </div>
+
+            <button type="submit" disabled={formik.isSubmitting} className="btn-primary btn-large" style={{width: '100%', border: 'none', cursor: 'pointer', marginTop: '1rem'}}>
+              {formik.isSubmitting ? <Loader2 size={18} className="spin" /> : <span className="btn-premium">Continue to Dashboard</span>}
+            </button>
+          </form>
+
+          <div className="auth-divider">
+            <div className="divider-line" />
+            Social Sign In
+            <div className="divider-line" />
+          </div>
+
+          <div className="social-group">
+            {[
+              { name: 'Google', icon: <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /> },
+              { name: 'GitHub', icon: <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /> }
+            ].map(({ name, icon }) => (
+              <button key={name} type="button" className="social-btn">
+                <span className="social-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                    {icon}
+                  </svg>
+                </span>
+                {name}
+              </button>
+            ))}
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

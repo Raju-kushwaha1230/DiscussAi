@@ -1,0 +1,109 @@
+/* App-level overrides — intentionally minimal */
+
+/* Enhanced Animation Utilities */
+.animated-inherit {
+  animation-duration: inherit;
+  animation-timing-function: inherit;
+  animation-delay: inherit;
+  animation-iteration-count: inherit;
+  animation-direction: inherit;
+  animation-fill-mode: inherit;
+  animation-play-state: inherit;
+}
+
+/* Motion Variants */
+.motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    animation-duration: var(--animation-duration, 0.3s);
+    transition-duration: var(--transition-duration, 0.2s);
+  }
+}
+
+.motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Hover Transition Utilities */
+.hover-scale-105:hover {
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-scale-95:hover {
+  --tw-scale-x: 0.95;
+  --tw-scale-y: 0.95;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-translate-y-1:hover {
+  --tw-translate-y: -0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Focus Ring Utilities */
+.focus-ring-2:focus-visible {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-panel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-highlight);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation Duration Variables */
+:root {
+  --animation-fast: 150ms;
+  --animation-normal: 300ms;
+  --animation-slow: 500ms;
+  --animation-delay-stagger: 100ms;
+}
+
+/* Animation Presets */
+.animate-fast-enter {
+  animation-duration: var(--animation-fast);
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-normal-enter {
+  animation-duration: var(--animation-normal);
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slow-enter {
+  animation-duration: var(--animation-slow);
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Stagger Animation Presets */
+.stagger-fast {
+  animation-delay: calc(var(--index) * var(--animation-delay-stagger));
+}
+
+.stagger-normal {
+  animation-delay: calc(var(--index) * var(--animation-delay-stagger) * 1.5);
+}
+
+.stagger-slow {
+  animation-delay: calc(var(--index) * var(--animation-delay-stagger) * 2);
+}
