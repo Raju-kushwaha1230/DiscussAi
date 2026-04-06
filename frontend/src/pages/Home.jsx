@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
-  ChevronRight, Check, User, Twitter, Github, Linkedin, Crown, 
-  BarChart2, LogIn, UserPlus 
+  ChevronRight, Check, User, Crown, BarChart2, LogIn, UserPlus 
 } from 'lucide-react';
+import { FaGithub, FaTwitter, FaLinkedin } from "react-icons/fa";
 
 const Home = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -421,9 +421,9 @@ const Home = () => {
               The professional standard for AI-assisted communication and debate practice.
             </p>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-              <a href="#" className="social-link-icon"><Twitter size={18} /></a>
-              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><Github size={18} /></a>
-              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><Linkedin size={18} /></a>
+              <a href="#" className="social-link-icon"><FaTwitter size={18} /></a>
+              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><FaGithub size={18} /></a>
+              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><FaLinkedin size={18} /></a>
             </div>
           </div>
           
