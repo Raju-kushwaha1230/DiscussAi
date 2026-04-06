@@ -67,7 +67,7 @@ const RoomSetup = () => {
   const createRoom = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://discussai-27pf.onrender.com/api/rooms/create', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
