@@ -11,14 +11,17 @@ import DiscussionRoom from './pages/Room/DiscussionRoom';
 import { AuthProvider } from './context/AuthContext';
 import PublicRoute from './Routes/PublicRoutes';
 import PrivateRoute from './Routes/PrivateRoutes';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy-client-id';
 
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path='/' element={<Home />} />
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path='/' element={<Home />} />
 
           <Route  element={<PublicRoute />} >
             <Route path='/login' element={<Login />} />
@@ -36,7 +39,8 @@ function App() {
           
         </Routes>
       </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   )
 }
 

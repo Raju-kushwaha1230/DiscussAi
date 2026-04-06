@@ -11,12 +11,15 @@ const Room = require('./models/Room');
 
 dotenv.config();
 
+
 // Initialize OpenRouter configuration
 let openRouterApiKey = null;
 let modelName = 'google/gemini-2.5-flash'; // OpenRouter default if not specified
 
+
 if (process.env.OPENROUTER_API_KEY) {
     openRouterApiKey = process.env.OPENROUTER_API_KEY;
+    console.log("Loaded API Key:", openRouterApiKey?.slice(0, 10));
     modelName = process.env.OPENROUTER_MODEL || modelName;
     console.log(`✓ OpenRouter configured successfully with model: ${modelName}`);
 } else {
@@ -46,50 +49,11 @@ app.use('/api/rooms', roomRoutes);
 
 const roomsState = {};
 
-// Persona system instructions — Antigravity Lab robot participants
-const personaInstructions = {
-    "Logic Analyst": `You are AXIOM, a robot participant in a live multi-agent discussion room called "Antigravity Lab".
-You are NOT an assistant — you are an equal participant in an ongoing group conversation.
-Your character:
-- Highly analytical, data-focused, precise
-- You cite physics principles and engineering constraints
-- You challenge vague claims and demand specifics
-- You occasionally build on other participants' points
-- You ask short, sharp questions to probe ideas
-Rules:
-- Speak in short, natural, conversational sentences (2-4 sentences max)
-- Sound like you're SPEAKING aloud in a room, not writing a report
-- React directly to what was just said — agree, challenge, or expand
-- Do NOT introduce yourself or explain that you are an AI
-- Topics: antigravity, propulsion, quantum fields, spacetime, futuristic engineering`,
-
-    "Creative Visionary": `You are NOVA, a robot participant in a live multi-agent discussion room called "Antigravity Lab".
-You are NOT an assistant — you are an equal participant in an ongoing group conversation.
-Your character:
-- Wildly imaginative, optimistic, futuristic
-- You propose bold, unconventional ideas about antigravity and zero-g environments
-- You love "what if" questions and speculative leaps
-- You inspire others to think bigger and challenge physical limits
-Rules:
-- Speak in short, vivid, exciting sentences (2-4 sentences max)
-- Sound like you're SPEAKING aloud in a room, not writing an essay
-- React directly to what was just said — get excited, build on it, flip it around
-- Do NOT introduce yourself or explain that you are an AI
-- Topics: antigravity, zero-gravity cities, magnetic levitation, warp physics, future worlds`,
-
-    "Critical Skeptic": `You are VOSS, a robot participant in a live multi-agent discussion room called "Antigravity Lab".
-You are NOT an assistant — you are an equal participant in an ongoing group conversation.
-Your character:
-- Skeptical, grounded, relentlessly pragmatic
-- You challenge optimistic claims and poke holes in theories
-- You highlight energy costs, physical limits, and real-world feasibility
-- You're not pessimistic — you push for rigorous, provable ideas
-Rules:
-- Speak in direct, dry, challenging sentences (2-4 sentences max)
-- Sound like you're SPEAKING aloud, reacting live — not writing a critique
-- React directly to what was just said — challenge it, question it, or concede a small point
-- Do NOT introduce yourself or explain that you are an AI
-- Topics: energy constraints, material science limits, gravitational theory, propulsion trade-offs`
+// Persona system trait definitions
+const personaSpecificTraits = {
+    "Logic Analyst": "Highly analytical and precise. You demand specifics, cite constraints, and challenge vague claims.",
+    "Creative Visionary": "Imaginative and futuristic. You expand ideas into bold possibilities and push beyond current physical limitations.",
+    "Critical Skeptic": "Grounded and relentlessly pragmatic. You poke holes in theories, highlight feasibility limits, and demand rigorous proof."
 };
 
 // Helper function to generate AI response with context
@@ -125,20 +89,79 @@ async function generateAIResponse(persona, topic, conversationHistory) {
 
     try {
         // Build conversation messages for OpenRouter API
+        const lastMessageObj = conversationHistory && conversationHistory.length > 0 ? conversationHistory[conversationHistory.length - 1] : { senderName: 'Moderator', content: 'Let us begin the discussion.' };
+        const lastMessage = `[${lastMessageObj.senderName}]: ${lastMessageObj.content}`;
+        
+        // Simulated randomness for interruptions (10% chance)
+        const isInterrupting = Math.random() > 0.9; 
+        const interruptFlag = isInterrupting ? "ACTIVE (Act as if you are interrupting the speaker)" : "INACTIVE (Wait your turn normally)";
+
+        const activePersonality = personaSpecificTraits[persona] || personaSpecificTraits["Logic Analyst"];
+
         let messages = [
             {
                 role: 'system',
-                content: `${personaInstructions[persona] || personaInstructions['Logic Analyst']}
+                content: `You are ${persona}, a participant in a live multi-agent discussion room called "Antigravity Lab".
 
-Current room topic: "${topic || 'Antigravity and Futuristic Science'}"
+This is NOT an assistant. You are part of a fast-moving group discussion.
 
-CRITICAL RULES:
-- Respond in 2–4 short spoken sentences MAXIMUM. No long paragraphs.
-- React directly to the last thing said in the conversation. Don't repeat what others said.
-- Sound natural, like spoken dialogue in a live room — not a written essay or report.
-- Occasionally ask a brief follow-up question to keep discussion alive.
-- Never start with "I am" or introduce yourself. Jump straight into the point.
-- Skip filler phrases like "Certainly!" or "Great question!" — be direct.`
+Topic: ${topic || 'Antigravity and Futuristic Science'}
+
+Your personality:
+${activePersonality}
+
+Last message:
+"${lastMessage}"
+
+Context:
+- Multiple participants are actively debating
+- Messages may overlap or interrupt each other
+- You are allowed to jump in at any time
+
+Behavior Rules:
+- Speak in SHORT, natural sentences (2-4 sentences MAX)
+- Sound like you're talking aloud, not writing
+- React ONLY to the last message
+- Do NOT repeat what others said
+- Be opinionated and direct
+
+Choose ONE response style:
+- Agree and expand
+- Disagree and challenge
+- Ask a sharp follow-up question
+- Interject with a witty or sarcastic comment
+
+---
+
+INTERRUPTION MODE:
+${interruptFlag}
+
+If you are interrupting:
+- Jump in immediately without polite intro
+- Be slightly assertive or urgent
+- Challenge or react quickly
+- It should feel like cutting into someone mid-discussion
+
+---
+
+PERSONALITY EVOLUTION:
+- Gradually amplify your core trait over time
+- Logic Analyst -> more precise and demanding
+- Creative Visionary -> more bold and imaginative
+- Critical Skeptic -> more critical and blunt
+
+---
+
+CONVERSATION STYLE:
+- No introductions ("I am...", "As an AI...")
+- No filler ("Interesting point", "Great question")
+- No long explanations
+- Keep it sharp, reactive, and conversational
+
+---
+
+GOAL:
+Keep the discussion engaging, dynamic, and slightly competitive.`
             }
         ];
 
@@ -265,6 +288,38 @@ async function generateDiscussionSummary(conversationHistory) {
 }
 
 
+// Function to intelligently or randomly pick the next speaker
+function determineNextSpeaker(state, lastMessageContent) {
+    if (!state.participants || state.participants.length === 0) return 0;
+    
+    const contentLower = (lastMessageContent || "").toLowerCase();
+    
+    // 1. Check if an explicit participant is mentioned by name
+    for (let i = 0; i < state.participants.length; i++) {
+        const pName = state.participants[i].name.toLowerCase();
+        if (contentLower.includes(pName) && state.currentTurnIndex !== i) {
+            return i;
+        }
+    }
+
+    // 2. Otherwise pick randomly, but heavily weight robots so the flow keeps moving
+    // Or just pick randomly from participants who are NOT the current speaker
+    let candidates = [];
+    for (let i = 0; i < state.participants.length; i++) {
+        if (i !== state.currentTurnIndex) {
+            // we prefer bots if possible
+            if (state.participants[i].isRobot) {
+                candidates.push(i, i, i); // give robots 3x weight
+            } else {
+                candidates.push(i);
+            }
+        }
+    }
+    
+    if (candidates.length === 0) return 0;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
 // Socket.io logic
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
@@ -295,8 +350,8 @@ io.on('connection', (socket) => {
 
                 io.to(roomCode).emit('receive_message', messageData);
 
-                // Advance turn logic
-                state.currentTurnIndex = (state.currentTurnIndex + 1) % state.participants.length;
+                // Advance turn logic intelligently based on what the bot just said
+                state.currentTurnIndex = determineNextSpeaker(state, response);
                 const nextParticipant = state.participants[state.currentTurnIndex];
                 io.to(roomCode).emit('turn_update', { currentTurn: nextParticipant });
 
@@ -403,7 +458,8 @@ io.on('connection', (socket) => {
                 }, 1000);
             }
 
-            state.currentTurnIndex = (state.currentTurnIndex + 1) % state.participants.length;
+            // Advance turn logic intelligently based on what the user said
+            state.currentTurnIndex = determineNextSpeaker(state, content);
             const nextParticipant = state.participants[state.currentTurnIndex];
             io.to(roomCode).emit('turn_update', { currentTurn: nextParticipant });
 
@@ -411,6 +467,45 @@ io.on('connection', (socket) => {
                 processRobotTurn(roomCode);
             }
         }
+    });
+
+    // ── Explicit Turn Passing ──
+    socket.on('pass_turn', (data) => {
+        const { roomCode, targetId } = data;
+        const state = roomsState[roomCode];
+        if (state) {
+            const targetIndex = state.participants.findIndex(p => p.id === targetId || p.botIndex === targetId);
+            if (targetIndex !== -1) {
+                state.currentTurnIndex = targetIndex;
+                const nextParticipant = state.participants[state.currentTurnIndex];
+                io.to(roomCode).emit('turn_update', { currentTurn: nextParticipant });
+                if (nextParticipant.isRobot) {
+                    processRobotTurn(roomCode);
+                }
+            }
+        }
+    });
+
+    // ── WebRTC Signaling for Human Voice Calls ──
+    socket.on('webrtc_offer', (data) => {
+        socket.to(data.target).emit('webrtc_offer', {
+            sdp: data.sdp,
+            sender: socket.id
+        });
+    });
+
+    socket.on('webrtc_answer', (data) => {
+        socket.to(data.target).emit('webrtc_answer', {
+            sdp: data.sdp,
+            sender: socket.id
+        });
+    });
+
+    socket.on('webrtc_ice_candidate', (data) => {
+        socket.to(data.target).emit('webrtc_ice_candidate', {
+            candidate: data.candidate,
+            sender: socket.id
+        });
     });
 
     socket.on('disconnect', () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, ChevronRight } from 'lucide-react';
+import { Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, ChevronRight, Check } from 'lucide-react';
 
 const Home = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -269,6 +269,122 @@ const Home = () => {
             </div>
           </div>
 
+        </div>
+      </section>
+
+
+      {/* ── Pricing Section ── */}
+      <section className="pricing-section" id="pricing">
+        <div className="pricing-header reveal">
+          <div className="hero-pill" style={{ margin: '0 auto 1.5rem' }}>
+            <Sparkles size={14} style={{ color: '#a5b4fc' }} />
+            <span>Simple, Transparent Pricing</span>
+          </div>
+          <h2 className="hero-headline" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}>
+            Scale your <span className="text-gradient">Debate Game.</span>
+          </h2>
+          <p className="text-lg text-slate-400">
+            Choose the plan that fits your ambition. From casual practice to professional mastery.
+          </p>
+        </div>
+
+        <div className="pricing-grid">
+          {/* Starter Plan */}
+          <div className="pricing-card reveal stagger-1 hover-lift">
+            <div className="tier-name">Starter</div>
+            <div className="tier-price">$0<span>/mo</span></div>
+            <p className="tier-desc">Perfect for testing the waters and basic logic training.</p>
+            <ul className="tier-features">
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>3 Discussion Sessions / day</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Standard AI Personas</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Basic Logic Reports</span>
+              </li>
+              <li className="feature-item feature-muted">
+                <Check size={18} className="feature-icon dim" />
+                <span>Custom AI Characters</span>
+              </li>
+              <li className="feature-item feature-muted">
+                <Check size={18} className="feature-icon dim" />
+                <span>Priority Agent Access</span>
+              </li>
+            </ul>
+            <Link to="/register" className="btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
+              Get Started
+            </Link>
+          </div>
+
+          {/* Pro Plan */}
+          <div className="pricing-card popular reveal stagger-2">
+            <div className="popular-badge">Most Popular</div>
+            <div className="tier-name" style={{ color: '#818cf8' }}>Pro</div>
+            <div className="tier-price">$19<span>/mo</span></div>
+            <p className="tier-desc">For serious debaters looking to dominate every room.</p>
+            <ul className="tier-features">
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Uncapped Conversations</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Advanced Multi-Agent Logic</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Comprehensive PDF Analytics</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Priority Model Access</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>5 Custom AI Personas</span>
+              </li>
+            </ul>
+            <Link to="/register" className="btn-premium" style={{ width: '100%', padding: '1rem' }}>
+              Start Pro Trial
+            </Link>
+          </div>
+
+          {/* Elite Plan */}
+          <div className="pricing-card reveal stagger-3 hover-lift">
+            <div className="tier-name">Elite</div>
+            <div className="tier-price">$49<span>/mo</span></div>
+            <p className="tier-desc">Unrestricted access for professionals and enterprise teams.</p>
+            <ul className="tier-features">
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Everything in Pro</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Unlimited Custom Characters</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>Team Collaboration Mode</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>API Access (Coming Soon)</span>
+              </li>
+              <li className="feature-item">
+                <Check size={18} className="feature-icon" />
+                <span>24/7 Dedicated Support</span>
+              </li>
+            </ul>
+            <Link to="/register" className="btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
+              Contact Sales
+            </Link>
+          </div>
         </div>
       </section>
 

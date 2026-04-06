@@ -79,6 +79,10 @@ const DiscussionRoom = () => {
   const userRef = useRef(user);
   const currentTurnRef = useRef(null);
 
+  // WebRTC Refs
+  const peersRef = useRef({});
+  const localStreamRef = useRef(null);
+
   useEffect(() => { isVisualModeRef.current = isVisualMode; }, [isVisualMode]);
   useEffect(() => { userRef.current = user; }, [user]);
   useEffect(() => { currentTurnRef.current = currentTurn; }, [currentTurn]);
@@ -237,6 +241,48 @@ const DiscussionRoom = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTurn?.name, startWaveform]);
 
+  // ── WebRTC Setup ──
+  const createPeer = useCallback((peerId) => {
+    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    peersRef.current[peerId] = pc;
+
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current));
+    }
+
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        socket.emit('webrtc_ice_candidate', { target: peerId, candidate: event.candidate });
+      }
+    };
+
+    pc.ontrack = (event) => {
+      if (!document.getElementById(`audio-${peerId}`)) {
+        const audio = document.createElement('audio');
+        audio.id = `audio-${peerId}`;
+        audio.srcObject = event.streams[0];
+        audio.autoplay = true;
+        document.body.appendChild(audio);
+      }
+    };
+
+    return pc;
+  }, []);
+
+  useEffect(() => {
+    // Setup continuous active mic stream once for WebRTC calling
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      localStreamRef.current = stream;
+    }).catch(err => console.warn('Mic access denied for group call:', err));
+
+    return () => {
+      Object.values(peersRef.current).forEach(pc => pc.close());
+      peersRef.current = {};
+      [...document.querySelectorAll('audio[id^="audio-"]')].forEach(el => el.remove());
+    };
+  }, []);
+
+
   const toggleListening = () => {
     if (!recognitionRef.current) { alert('Speech Recognition not supported in this browser.'); return; }
     if (isListeningRef.current) {
@@ -262,7 +308,13 @@ const DiscussionRoom = () => {
     setInputText(''); inputTextRef.current = '';
   };
 
-  const handlePassTurn = () => {
+  const handlePassTurn = (targetId = null) => {
+    if (targetId) {
+      // Explicit target pass
+      socket.emit('pass_turn', { roomCode: roomId, targetId: targetId });
+      setVoiceReady(false);
+      return;
+    }
     const text = inputTextRef.current.trim();
     if (!text) return;
     handleVoiceSend(text);
@@ -281,16 +333,29 @@ const DiscussionRoom = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Initial participants — assign real bot personas
-    const count = botCount || 3;
-    setParticipants([
-      { id: user?._id || 'me', name: user?.name || 'You', isMe: true, isRobot: false, botIndex: -1 },
-      ...DEFAULT_BOT_METAS.slice(0, count).map((meta, i) => ({
-        id: `ai-${i}`, name: meta.codename, isMe: false, isRobot: true, botIndex: i
-      }))
-    ]);
+    let localCleanup = false;
 
-    socket.emit('join_room', { roomCode: roomId, userName: user?.name || 'You' });
+    // 1. Get mic access first so WebRTC streams are ready BEFORE we emit join_room
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      if (localCleanup) return;
+      localStreamRef.current = stream;
+      
+      // Initial participants
+      const count = botCount || 3;
+      setParticipants([
+        { id: user?._id || 'me', name: user?.name || 'You', isMe: true, isRobot: false, botIndex: -1 },
+        ...DEFAULT_BOT_METAS.slice(0, count).map((meta, i) => ({
+          id: `ai-${i}`, name: meta.codename, isMe: false, isRobot: true, botIndex: i
+        }))
+      ]);
+
+      // 2. Join room only after mic is active
+      socket.emit('join_room', { roomCode: roomId, userName: user?.name || 'You' });
+    }).catch(err => {
+      console.warn('Mic access denied for group call:', err);
+      // Still join the room even if mic is denied
+      socket.emit('join_room', { roomCode: roomId, userName: user?.name || 'You' });
+    });
 
     socket.on('receive_message', (data) => {
       setMessages(prev => [...prev, {
@@ -305,11 +370,10 @@ const DiscussionRoom = () => {
       }]);
       if (data.isRobot) setIsTyping(false);
       if (data.senderName !== userRef.current?.name) {
-        if (isVisualModeRef.current) {
-          speakMessage(data.content, data.senderName, data.botIndex || 0);
-        } else {
+        speakMessage(data.content, data.senderName, data.botIndex || 0);
+        if (!isVisualModeRef.current) {
           setActiveSpeaker(data.senderName);
-          setTimeout(() => setActiveSpeaker(null), 4000);
+          setTimeout(() => setActiveSpeaker(null), Math.max(3000, data.content.length * 50));
         }
       }
     });
@@ -321,7 +385,7 @@ const DiscussionRoom = () => {
       if (data.currentTurn) setCurrentTurn(data.currentTurn);
     });
 
-    socket.on('user_joined', (data) => {
+    socket.on('user_joined', async (data) => {
       if (data.userName === user?.name) return;
       setParticipants(prev => {
         if (prev.find(p => p.name === data.userName)) return prev;
@@ -331,16 +395,48 @@ const DiscussionRoom = () => {
         ...prev,
         { id: Date.now() + Math.random(), senderName: 'System', content: `${data.userName} joined the discussion.`, type: 'system' }
       ]);
+
+      // WebRTC: Caller creates offer for new user
+      if (localStreamRef.current) {
+        const pc = createPeer(data.userId);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit('webrtc_offer', { target: data.userId, sdp: offer });
+      }
+    });
+
+    socket.on('webrtc_offer', async (data) => {
+      if (localStreamRef.current) {
+        const pc = createPeer(data.sender);
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit('webrtc_answer', { target: data.sender, sdp: answer });
+      }
+    });
+
+    socket.on('webrtc_answer', async (data) => {
+      const pc = peersRef.current[data.sender];
+      if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+    });
+
+    socket.on('webrtc_ice_candidate', async (data) => {
+      const pc = peersRef.current[data.sender];
+      if (pc) await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
     });
 
     return () => {
+      localCleanup = true;
       socket.off('receive_message');
       socket.off('room_data');
       socket.off('user_joined');
       socket.off('turn_update');
       socket.off('bot_typing');
+      socket.off('webrtc_offer');
+      socket.off('webrtc_answer');
+      socket.off('webrtc_ice_candidate');
     };
-  }, [roomId, user, botCount, speakMessage]);
+  }, [roomId, user, botCount, speakMessage, createPeer]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
@@ -622,82 +718,20 @@ const DiscussionRoom = () => {
               <div ref={chatEndRef}/>
             </div>
 
-            {/* ── Voice Turn Panel ── */}
-            {currentTurn?.name === user?.name && (
-              <div className="voice-turn-panel">
-                <div className="vtp-status-row">
-                  <span className={`vtp-dot ${isListening ? 'vtp-dot-listening' : voiceReady ? 'vtp-dot-ready' : 'vtp-dot-idle'}`}/>
-                  <span className="vtp-status-text">
-                    {isListening ? '🎙 Listening…' : voiceReady ? '✅ Captured – ready to pass' : '🎤 It\'s your turn!'}
-                  </span>
-                </div>
-
-                {isListening && (
-                  <canvas ref={canvasChatRef} className="vtp-waveform" width={500} height={48}/>
-                )}
-
-                <div className="vtp-transcript">
-                  {inputText
-                    ? <span>{inputText}</span>
-                    : <em className="vtp-placeholder">Start speaking or type below…</em>
-                  }
-                </div>
-
-                <div className="vtp-actions">
-                  {isListening ? (
-                    <button className="vtp-btn-stop" onClick={handleDoneSpeaking}>
-                      <MicOff size={16}/> Done Speaking
-                    </button>
-                  ) : (
-                    <button className="vtp-btn-mic" onClick={toggleListening} disabled={voiceReady}>
-                      <Mic size={16}/> {voiceReady ? 'Recorded ✓' : 'Speak Again'}
-                    </button>
-                  )}
-                  {voiceReady && (
-                    <button className="vtp-btn-pass" onClick={handlePassTurn}>
-                      <ArrowRightCircle size={16}/> Pass Turn
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Waiting state */}
-            {currentTurn && currentTurn.name !== user?.name && (
-              <div className="chat-waiting">
-                <div className="waiting-dots"><span/><span/><span/></div>
-                <span>
-                  Waiting for <strong>
-                    {getBotMeta(currentTurn.name, 0).codename || currentTurn.name}
-                  </strong>…
-                </span>
-              </div>
-            )}
-
-            {/* Text input fallback */}
-            {(currentTurn?.name === user?.name) && !isListening && (
-              <form className="chat-input-area" onSubmit={handleSend}>
-                <input
-                  type="text"
-                  className="chat-input"
-                  placeholder="Or type your response…"
-                  value={inputText}
-                  onChange={e => { setInputText(e.target.value); inputTextRef.current = e.target.value; setVoiceReady(false); }}
-                />
-                <button type="submit" className="chat-send-btn" disabled={!inputText.trim()}>
-                  <Send size={18}/>
-                </button>
-              </form>
-            )}
-
-            {/* No-turn text fallback */}
-            {!currentTurn && (
-              <form className="chat-input-area" onSubmit={handleSend}>
-                <input type="text" className="chat-input" placeholder="Type a message…" value={inputText}
-                  onChange={e => { setInputText(e.target.value); inputTextRef.current = e.target.value; }}/>
-                <button type="submit" className="chat-send-btn" disabled={!inputText.trim()}><Send size={18}/></button>
-              </form>
-            )}
+            {/* Always visible Universal Input Area */}
+            <form className="chat-input-area" onSubmit={handleSend} style={{ borderTop: '1px solid var(--border)', padding: '1rem', background: 'var(--bg-surface)' }}>
+              <button 
+                type="button" 
+                onClick={toggleListening} 
+                className={`btn-icon-bg ${isListening ? 'recording-pulse' : ''}`} 
+                style={{ marginRight: '0.5rem', color: isListening ? '#ef4444' : '#64748b' }}
+              >
+                {isListening ? <Mic size={18} /> : <MicOff size={18} />}
+              </button>
+              <input type="text" className="chat-input" placeholder="Jump into the discussion anytime..." value={inputText}
+                onChange={e => { setInputText(e.target.value); inputTextRef.current = e.target.value; }}/>
+              <button type="submit" className="chat-send-btn" disabled={!inputText.trim()}><Send size={18}/></button>
+            </form>
           </section>
         )}
 
@@ -734,7 +768,20 @@ const DiscussionRoom = () => {
                         {isSpeaking ? '● Speaking' : p.isRobot ? meta.role : 'Online'}
                       </span>
                     </div>
-                    {isOnTurn && <div className="p-turn-dot"/>}
+                    
+                    {/* Pass Turn Action */}
+                    {!p.isMe && (
+                      <button 
+                        className="p-pass-btn" 
+                        title={`Hand the floor to ${p.isRobot ? meta.codename : p.name}`}
+                        onClick={() => handlePassTurn(p.id)}
+                        style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.2rem 0.4rem', color: '#94a3b8', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem', marginLeft: 'auto' }}
+                      >
+                        <Mic size={12}/> Pass
+                      </button>
+                    )}
+                    
+                    {isOnTurn && !p.isMe && <div className="p-turn-dot"/>}
                   </div>
                 );
               })}

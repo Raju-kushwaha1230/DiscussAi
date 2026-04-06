@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
+const { OAuth2Client } = require('google-auth-library');
 
 const register = async (req, res)=>{
     const {name, email, password} = req.body;
@@ -66,10 +67,54 @@ const getProfile = async(req, res)=>{
     }
 }
 
+const googleLogin = async (req, res) => {
+    const { access_token } = req.body;
+    try {
+        // Fetch user profile from Google using the access_token
+        const googleResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        
+        if (!googleResponse.ok) {
+            throw new Error('Failed to fetch user info from Google');
+        }
 
+        const payload = await googleResponse.json();
+        const { email, name, sub: googleId } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = new User({
+                name,
+                email,
+                googleId
+            });
+            await user.save();
+        } else if (!user.googleId) {
+            user.googleId = googleId;
+            await user.save();
+        }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({ success: true, message: 'Google login successful', user, token });
+    } catch (error) {
+        console.error('Google login error:', error);
+        res.status(500).json({ message: 'Internal server error during Google login' });
+    }
+}
 
 module.exports = {
     register,
     login,
-    getProfile
+    getProfile,
+    googleLogin
 }

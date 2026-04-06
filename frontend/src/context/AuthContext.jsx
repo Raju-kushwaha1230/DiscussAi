@@ -81,6 +81,25 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const handleGoogleLogin = async (access_token) => {
+        try {
+            const response = await api.post('/auth/google', { access_token });
+            const { data } = response;
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                setToken(data.token);
+                setUser(data.user);
+                return { success: true };
+            } else {
+                return { success: false, message: data.message };
+            }
+        } catch (error) {
+            const message = error.response?.data?.message || 'An error occurred during Google login';
+            console.error('Google login error:', error);
+            return { success: false, message };
+        }
+    };
+
     const [aiPreferences, setAiPreferences] = useState(() => {
         const saved = localStorage.getItem('aiPreferences');
         return saved ? JSON.parse(saved) : { complexity: 'standard', engine: 'neural' };
@@ -106,6 +125,7 @@ export const AuthProvider = ({ children }) => {
         updateAiPreferences,
         login,
         register,
+        handleGoogleLogin,
         logout,
     };
 
