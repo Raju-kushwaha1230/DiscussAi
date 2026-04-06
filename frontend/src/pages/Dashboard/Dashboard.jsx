@@ -36,7 +36,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchPublicRooms = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/rooms/public');
+        const res = await fetch('https://discussai-27pf.onrender.com/api/rooms/public');
         const data = await res.json();
         setRooms(data);
       } catch (err) { console.error("Error fetching rooms:", err); }
@@ -46,7 +46,7 @@ const Dashboard = () => {
     const fetchHistory = async () => {
       if (!user?._id) return;
       try {
-        const res = await fetch(`http://localhost:3000/api/rooms/history/${user._id}`);
+        const res = await fetch(`https://discussai-27pf.onrender.com/api/rooms/history/${user._id}`);
         const data = await res.json();
         setHistory(data);
       } catch (err) { console.error("Error fetching history:", err); }
@@ -79,7 +79,7 @@ const Dashboard = () => {
     setJoinLoading(true);
     setJoinError('');
     try {
-      const res = await fetch('http://localhost:3000/api/rooms/join', {
+      const res = await fetch('https://discussai-27pf.onrender.com//api/rooms/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomCode: roomCode.trim(), userId: user?._id })
