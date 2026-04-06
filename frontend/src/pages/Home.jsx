@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
-  ChevronRight, Check, User, TwitterIcon, GithubIcon, LinkedinIcon, Crown, 
-  BarChart2, LogIn, UserPlus 
+  ChevronRight, Check, User, Twitter, Github, Linkedin, Crown, 
+  BarChart3, LogIn, UserPlus 
 } from 'lucide-react';
 
 const Home = () => {
@@ -266,7 +266,7 @@ const Home = () => {
           /* Vertical Span */
           <div className="bento-card bento-vertical group border-l-indigo-500/30 reveal stagger-2 hover-lift">
             <div className="bento-icon text-indigo-400 bg-indigo-500/10 border-indigo-500/20" style={{ marginBottom: '1.5rem' }}>
-              <BarChart2 size={24} />
+              <BarChart3 size={24} />
             </div>
             <div className="bento-content bento-content-top">
               <h3 className="bento-title" style={{fontSize: '1.75rem'}}>Analytics Dashboard</h3>
@@ -421,9 +421,9 @@ const Home = () => {
               The professional standard for AI-assisted communication and debate practice.
             </p>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-              <a href="#" className="social-link-icon"><TwitterIcon size={18} /></a>
-              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><GithubIcon size={18} /></a>
-              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><LinkedinIcon size={18} /></a>
+              <a href="#" className="social-link-icon"><Twitter size={18} /></a>
+              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><Github size={18} /></a>
+              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><Linkedin size={18} /></a>
             </div>
           </div>
           

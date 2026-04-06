@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Loader2, Mail, ArrowLeft, Zap, Sparkles } from 'lucide-react';
+import { Loader2, Mail, ArrowLeft, Zap, Sparkles, Bot } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useState } from 'react';
 
 const Forgot = () => {
   const [sent, setSent] = useState(false);
@@ -38,10 +40,10 @@ const Forgot = () => {
         <div className="animate-float glow-border" style={{
           position: 'relative', zIndex: 10, width: '7.5rem', height: '7.5rem', borderRadius: '2rem',
           background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           marginBottom: '3rem', boxShadow: '0 30px 60px rgba(99, 102, 241, 0.4)', border: '1px solid rgba(255, 255, 255, 0.15)'
         }}>
-          💡
+          <Bot size={48} color="white" />
         </div>
 
         <div className="relative z-10 text-center" style={{maxWidth: '380px', padding: '0 2rem'}}>
@@ -61,7 +63,7 @@ const Forgot = () => {
         <div className="auth-card animate-slide-right glow-border" style={{background: 'var(--bg-surface)', padding: '2.5rem', borderRadius: '1.5rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'}}>
           {/* Logo mobile */}
           <Link to="/" className="logo-mobile logo">
-            <div className="logo-icon">💬</div>
+            <div className="logo-icon"><Bot size={18} /></div>
             <span className="logo-text">Discuss<span className="gradient-text">AI</span></span>
           </Link>
 
