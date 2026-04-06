@@ -58,7 +58,7 @@ const personaSpecificTraits = {
 
 // Helper function to generate AI response with context
 async function generateAIResponse(persona, topic, conversationHistory) {
-    if (!openRouterApiKey || openRouterApiKey === 'your_openrouter_api_key_here') {
+    if (!openRouterApiKey || openRouterApiKey === process.env.OPENROUTER_API_KEY) {
         // Fallback templates — Antigravity Lab style
         const fallbackTemplates = {
             "Logic Analyst": [
@@ -184,7 +184,7 @@ Keep the discussion engaging, dynamic, and slightly competitive.`
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${openRouterApiKey}`,
-                'HTTP-Referer': 'http://localhost:3000', // Optional, for including your app on openrouter.ai rankings
+                'HTTP-Referer': 'https://discussai.vercel.app', // Optional, for including your app on openrouter.ai rankings
                 'X-Title': 'DiscussAI', // Optional. Shows in rankings on openrouter.ai
                 'Content-Type': 'application/json'
             },
@@ -236,7 +236,7 @@ Keep the discussion engaging, dynamic, and slightly competitive.`
 
 // Helper function to generate discussion summary
 async function generateDiscussionSummary(conversationHistory) {
-    if (!openRouterApiKey || openRouterApiKey === 'your_openrouter_api_key_here' || !conversationHistory || conversationHistory.length === 0) {
+    if (!openRouterApiKey || openRouterApiKey === process.env.OPENROUTER_API_KEY || !conversationHistory || conversationHistory.length === 0) {
         return "Synthesizing... Key arguments so far include diverse perspectives from our expert panel.";
     }
 
@@ -260,7 +260,7 @@ async function generateDiscussionSummary(conversationHistory) {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${openRouterApiKey}`,
-                'HTTP-Referer': 'http://localhost:3000',
+                'HTTP-Referer': 'https://discussai.vercel.app',
                 'X-Title': 'DiscussAI',
                 'Content-Type': 'application/json'
             },
@@ -515,5 +515,5 @@ io.on('connection', (socket) => {
 
 
 server.listen(port, () => {
-    console.log(`Server is running on port http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
