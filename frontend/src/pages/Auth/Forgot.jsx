@@ -26,6 +26,10 @@ const Forgot = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Forgot Password | DiscussAI</title>
+        <meta name="description" content="Recover your DiscussAI account password to get back to mastering your communication skills." />
+      </Helmet>
       {/* ── Left brand panel (md+) ── */}
       <div className="auth-left">
         <div className="hero-blob blob-1 animate-float-slow" style={{top: '-8rem', left: '-8rem', opacity: 0.2}} />

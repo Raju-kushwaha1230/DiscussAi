@@ -1,4 +1,5 @@
-import { Eye, EyeOff, Loader2, Cpu, Globe, Briefcase, Zap, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Cpu, Globe, Briefcase, Zap, Sparkles, CheckCircle2, UserPlus, Bot, User } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axiosApi';
 import { useFormik } from 'formik';
@@ -96,6 +97,10 @@ const Register = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Join DiscussAI | Start Your Journey</title>
+        <meta name="description" content="Create your DiscussAI account to start practicing with AI personas. Level up your logic, reasoning, and public speaking today." />
+      </Helmet>
       {/* ── Left brand panel (md+) ── */}
       <div className="auth-left">
         <div className="hero-blob blob-1 animate-float-slow" style={{top: '-8rem', left: '-8rem', opacity: 0.15}} />
@@ -133,7 +138,9 @@ const Register = () => {
           <div style={{marginTop: '3.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem'}}>
              <div style={{display: 'flex', alignItems: 'center', gap: '-10px', marginLeft: '10px'}}>
                 {[1,2,3,4].map(i => (
-                  <div key={i} style={{width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '3px solid #0d0d1f', background: 'linear-gradient(135deg, #6366f1, #a855f7)', marginLeft: '-12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem'}}>U{i}</div>
+              <div key={i} style={{width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '3px solid #0d0d1f', background: 'linear-gradient(135deg, #6366f1, #a855f7)', marginLeft: '-12px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <User size={16} color="white" />
+              </div>
                 ))}
                 <div style={{width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '3px solid #0d0d1f', background: '#1e1e2e', marginLeft: '-12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', color: '#94a3b8'}}>+5k</div>
              </div>
@@ -149,11 +156,13 @@ const Register = () => {
         <div className="auth-card animate-slide-right glow-border" style={{background: 'var(--bg-surface)', padding: '2.5rem', borderRadius: '1.5rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'}}>
           {/* Logo mobile */}
           <Link to="/" className="logo-mobile logo">
-            <div className="logo-icon">💬</div>
+            <div className="logo-icon"><Bot size={18} /></div>
             <span className="logo-text">Discuss<span className="gradient-text">AI</span></span>
           </Link>
 
-          <h1 className="auth-title"  >Create Account</h1>
+          <h1 className="auth-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <UserPlus size={24} style={{ color: 'var(--primary)' }} /> Create Account
+          </h1>
           <p className="auth-sub">
             Build your skills today. <Link to="/login" className="auth-link">Already have an account?</Link>
           </p>
@@ -260,7 +269,7 @@ const Register = () => {
             </div>
 
             <button type="submit" disabled={formik.isSubmitting} className="btn-primary btn-large" style={{width: '100%', border: 'none', cursor: 'pointer', marginTop: '1rem'}}>
-              {formik.isSubmitting ? <Loader2 size={18} className="spin" /> : <span className="btn-premium">Create Account</span>}
+              {formik.isSubmitting ? <Loader2 size={18} className="spin" /> : <span className="btn-premium" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}><UserPlus size={18} /> Create Account</span>}
             </button>
           </form>
 

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, ChevronRight, Check } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { 
+  Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
+  ChevronRight, Check, User, Twitter, Github, Linkedin, Crown, 
+  BarChart2, LogIn, UserPlus 
+} from 'lucide-react';
 
 const Home = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -41,6 +46,10 @@ const Home = () => {
 
   return (
     <div className="min-h-screen" onMouseMove={handleMouseMove}>
+      <Helmet>
+        <title>DiscussAI - Master Every Debate with AI Brilliance</title>
+        <meta name="description" content="Engage in high-stakes discussions with AI experts. Master logic, reasoning, and public speaking with our professional AI debate platform." />
+      </Helmet>
       
       {/* ── Navigation (Premium) ── */}
       <nav className={`navbar-premium ${scrolled ? 'navbar-scrolled' : ''}`}>
@@ -58,9 +67,11 @@ const Home = () => {
         </div>
         
         <div className="nav-actions">
-          <Link to="/login" className="btn-secondary hidden sm:inline-flex">Sign In</Link>
-          <Link to="/register" className="btn-premium">
-            Get Started <ChevronRight size={16} />
+          <Link to="/login" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <LogIn size={16} /> <span className="hidden sm:inline">Sign In</span>
+          </Link>
+          <Link to="/register" className="btn-premium" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <UserPlus size={16} /> <span>Get Started</span>
           </Link>
         </div>
       </nav>
@@ -96,7 +107,9 @@ const Home = () => {
           <div className="hero-users">
              <div className="user-avatars">
                 {[1,2,3].map(i => (
-                  <div key={i} className="avatar-sm">U{i}</div>
+                  <div key={i} className="avatar-sm">
+                    <User size={16} style={{ opacity: 0.8 }} />
+                  </div>
                 ))}
              </div>
              <div style={{fontSize: '0.875rem', color: '#94a3b8', fontWeight: 500}}>Join <span style={{color: '#e2e8f0'}}>10,000+</span> professionals.</div>
@@ -192,7 +205,9 @@ const Home = () => {
                     ['Post-session comprehensive analytical reports']
                   ].map((text, i) => (
                     <li key={i} className="list-item-premium">
-                       <div className="check-icon">✓</div>
+                       <div className="check-icon">
+                         <Check size={14} />
+                       </div>
                        {text}
                     </li>
                   ))}
@@ -250,6 +265,9 @@ const Home = () => {
           
           /* Vertical Span */
           <div className="bento-card bento-vertical group border-l-indigo-500/30 reveal stagger-2 hover-lift">
+            <div className="bento-icon text-indigo-400 bg-indigo-500/10 border-indigo-500/20" style={{ marginBottom: '1.5rem' }}>
+              <BarChart2 size={24} />
+            </div>
             <div className="bento-content bento-content-top">
               <h3 className="bento-title" style={{fontSize: '1.75rem'}}>Analytics Dashboard</h3>
               <p className="bento-desc">Track your interruption rate, vocabulary diversity, and logical consistency over time.</p>
@@ -291,6 +309,7 @@ const Home = () => {
         <div className="pricing-grid">
           {/* Starter Plan */}
           <div className="pricing-card reveal stagger-1 hover-lift">
+            <div className="tier-icon"><Zap size={24} style={{ color: '#94a3b8' }} /></div>
             <div className="tier-name">Starter</div>
             <div className="tier-price">$0<span>/mo</span></div>
             <p className="tier-desc">Perfect for testing the waters and basic logic training.</p>
@@ -324,6 +343,7 @@ const Home = () => {
           {/* Pro Plan */}
           <div className="pricing-card popular reveal stagger-2">
             <div className="popular-badge">Most Popular</div>
+            <div className="tier-icon"><Sparkles size={24} style={{ color: '#818cf8' }} /></div>
             <div className="tier-name" style={{ color: '#818cf8' }}>Pro</div>
             <div className="tier-price">$19<span>/mo</span></div>
             <p className="tier-desc">For serious debaters looking to dominate every room.</p>
@@ -356,6 +376,7 @@ const Home = () => {
 
           {/* Elite Plan */}
           <div className="pricing-card reveal stagger-3 hover-lift">
+            <div className="tier-icon"><Crown size={24} style={{ color: '#f59e0b' }} /></div>
             <div className="tier-name">Elite</div>
             <div className="tier-price">$49<span>/mo</span></div>
             <p className="tier-desc">Unrestricted access for professionals and enterprise teams.</p>
@@ -399,6 +420,11 @@ const Home = () => {
             <p style={{ color: '#94a3b8', fontSize: '0.875rem', maxWidth: '20rem', lineHeight: 1.6 }}>
               The professional standard for AI-assisted communication and debate practice.
             </p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+              <a href="#" className="social-link-icon"><Twitter size={18} /></a>
+              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><Github size={18} /></a>
+              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><Linkedin size={18} /></a>
+            </div>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

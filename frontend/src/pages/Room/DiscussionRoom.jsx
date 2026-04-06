@@ -3,9 +3,11 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Send, Mic, MicOff, Users, Clock, PhoneOff, Bot,
   ChevronLeft, Settings, Sparkles, ArrowRightCircle, X,
-  Star, BarChart2, MessageSquare, Zap, CheckCircle2, Volume2
+  Star, BarChart2, MessageSquare, Zap, CheckCircle2, Volume2,
+  Cpu, ShieldCheck, User
 } from 'lucide-react';
 import io from 'socket.io-client';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../context/AuthContext';
 import './DiscussionRoom.css';
 
@@ -14,18 +16,18 @@ const socket = io(import.meta.env.VITE_BACKEND_URL);
 // ── Bot Identity Map ──
 // Keys must match what the server sends in senderName / persona field
 const BOT_META = {
-  'AXIOM':             { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: '⬡', gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
-  'NOVA':              { codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: '✦', gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
-  'VOSS':              { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: '◈', gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
-  'Logic Analyst':     { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: '⬡', gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
-  'Creative Visionary':{ codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: '✦', gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
-  'Critical Skeptic':  { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: '◈', gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
+  'AXIOM':             { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: <Cpu size={22} />, gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
+  'NOVA':              { codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: <Sparkles size={22} />, gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
+  'VOSS':              { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: <ShieldCheck size={22} />, gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
+  'Logic Analyst':     { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: <Cpu size={22} />, gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
+  'Creative Visionary':{ codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: <Sparkles size={22} />, gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
+  'Critical Skeptic':  { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: <ShieldCheck size={22} />, gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
 };
 
 const DEFAULT_BOT_METAS = [
-  { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: '⬡', gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
-  { codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: '✦', gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
-  { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: '◈', gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
+  { codename: 'AXIOM', role: 'Logic Analyst',      color: '#3b82f6', glow: 'rgba(59,130,246,0.4)',  icon: <Cpu size={22} />, gradient: 'linear-gradient(135deg,#1e40af,#1e3a8a)' },
+  { codename: 'NOVA',  role: 'Creative Visionary',  color: '#a855f7', glow: 'rgba(168,85,247,0.4)', icon: <Sparkles size={22} />, gradient: 'linear-gradient(135deg,#7c3aed,#4c1d95)' },
+  { codename: 'VOSS',  role: 'Critical Skeptic',    color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', icon: <ShieldCheck size={22} />, gradient: 'linear-gradient(135deg,#d97706,#92400e)' },
 ];
 
 const getBotMeta = (name, botIndex = 0) => {
@@ -464,6 +466,10 @@ const DiscussionRoom = () => {
   // ── Render ──
   return (
     <div className="room-container">
+      <Helmet>
+        <title>{topic} | DiscussAI Live Room</title>
+        <meta name="description" content={`Live AI-assisted discussion on "${topic}". Join the conversation and sharpen your debate skills.`} />
+      </Helmet>
 
       {/* ── Session Summary Modal ── */}
       {sessionEndModal && (
@@ -577,7 +583,7 @@ const DiscussionRoom = () => {
                       </div>
                     ) : (
                       <div className="va-face va-face-user">
-                        {(p.name || 'Y').charAt(0).toUpperCase()}
+                        <User size={24} />
                       </div>
                     )}
 
@@ -679,7 +685,7 @@ const DiscussionRoom = () => {
                         className="msg-avatar"
                         style={m.type === 'ai' ? { background: `${meta.color}18`, color: meta.color, border: `1px solid ${meta.color}30` } : {}}
                       >
-                        {m.type === 'ai' ? meta.icon : m.senderName.charAt(0)}
+                        {m.type === 'ai' ? meta.icon : <User size={16} />}
                       </div>
                     )}
                     <div className="msg-body">
@@ -709,7 +715,7 @@ const DiscussionRoom = () => {
               {/* Typing indicator */}
               {isTyping && (
                 <div className="msg-row msg-bot">
-                  <div className="msg-avatar" style={{ background: '#3b82f618', color: '#3b82f6', border: '1px solid #3b82f630' }}>⬡</div>
+                  <div className="msg-avatar" style={{ background: '#3b82f618', color: '#3b82f6', border: '1px solid #3b82f630' }}><Cpu size={16} /></div>
                   <div className="msg-body">
                     <div className="typing-dots"><span/><span/><span/></div>
                   </div>
@@ -760,7 +766,7 @@ const DiscussionRoom = () => {
                         {meta.icon}
                       </div>
                     ) : (
-                      <div className="p-avatar p-avatar-user">{(p.name || 'Y').charAt(0).toUpperCase()}</div>
+                      <div className="p-avatar p-avatar-user"><User size={14} /></div>
                     )}
                     <div className="p-info">
                       <span className="p-name">{p.isRobot ? meta.codename : (p.isMe ? `${p.name} (You)` : p.name)}</span>

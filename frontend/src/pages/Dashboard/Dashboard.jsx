@@ -3,8 +3,9 @@ import {
   Bot, Search, Plus, Users, History, Settings, LogOut,
   MessageSquare, Cpu, Sparkles, ChevronRight, User,
   Globe, Zap, TrendingUp, Clock, Star, X, Copy,
-  CheckCircle2, Mic, BarChart2, ArrowUpRight, Bell
+  CheckCircle2, Mic, BarChart2, ArrowUpRight, Bell, ShieldCheck
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import './Dashboard.css';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -97,9 +98,9 @@ const Dashboard = () => {
   };
 
   const BOT_PERSONAS = [
-    { name: 'AXIOM', role: 'Logic Analyst', color: 'var(--axiom)', bg: 'rgba(59,130,246,0.12)' },
-    { name: 'NOVA', role: 'Creative Visionary', color: 'var(--nova)', bg: 'rgba(168,85,247,0.12)' },
-    { name: 'VOSS', role: 'Critical Skeptic', color: 'var(--voss)', bg: 'rgba(245,158,11,0.12)' },
+    { name: 'AXIOM', role: 'Logic Analyst', color: 'var(--axiom)', bg: 'rgba(59,130,246,0.12)', icon: <Cpu size={24} /> },
+    { name: 'NOVA', role: 'Creative Visionary', color: 'var(--nova)', bg: 'rgba(168,85,247,0.12)', icon: <Sparkles size={24} /> },
+    { name: 'VOSS', role: 'Critical Skeptic', color: 'var(--voss)', bg: 'rgba(245,158,11,0.12)', icon: <ShieldCheck size={24} /> },
   ];
 
   const filteredRooms = rooms.filter(r =>
@@ -157,7 +158,7 @@ const Dashboard = () => {
           {BOT_PERSONAS.map(bot => (
             <div key={bot.name} className="persona-preview-card" style={{ '--bot-color': bot.color, '--bot-bg': bot.bg }}>
               <div className="persona-avatar-lg" style={{ background: bot.bg, color: bot.color }}>
-                {bot.name[0]}
+                {bot.icon}
               </div>
               <div className="persona-info">
                 <div className="persona-name" style={{ color: bot.color }}>{bot.name}</div>
@@ -283,9 +284,9 @@ const Dashboard = () => {
       </div>
       <div className="settings-grid">
         <div className="settings-card glow-border">
-          <h3>Profile</h3>
+          <h3><User size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} /> Profile</h3>
           <div className="profile-avatar-row">
-            <div className="profile-avatar-lg">{user?.name?.charAt(0)}</div>
+            <div className="profile-avatar-lg"><User size={32} /></div>
             <div>
               <div className="profile-name">{user?.name}</div>
               <div className="text-muted" style={{ fontSize: '0.85rem' }}>{user?.email}</div>
@@ -304,7 +305,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="settings-card glow-border">
-          <h3>AI Configuration</h3>
+          <h3><Cpu size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} /> AI Configuration</h3>
           <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '1.5rem' }}>Default settings for all your created rooms.</p>
           <div className="config-item">
             <div className="config-label"><Sparkles size={14} /> AI Complexity</div>
@@ -330,7 +331,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="settings-card glow-border">
-          <h3>Subscription</h3>
+          <h3><Zap size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} /> Subscription</h3>
           <div className="plan-display">
             <div className="plan-name">Pro Plan</div>
             <div className="plan-features">
@@ -348,6 +349,10 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
+      <Helmet>
+        <title>User Dashboard | DiscussAI</title>
+        <meta name="description" content="Manage your AI discussion rooms, review session history, and track your communication progress on the DiscussAI dashboard." />
+      </Helmet>
 
       {/* ── Join Room Modal ── */}
       {joinModalOpen && (
@@ -421,7 +426,7 @@ const Dashboard = () => {
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <div className="user-avatar">{user?.name?.charAt(0)}</div>
+            <div className="user-avatar"><User size={20} /></div>
             <div className="user-info">
               <div className="user-name">{user?.name}</div>
               <div className="user-plan">Pro Member</div>
@@ -445,7 +450,7 @@ const Dashboard = () => {
           </div>
           <div className="header-actions">
             <button className="btn-icon circle"><Bell size={17} /></button>
-            <div className="header-avatar">{user?.name?.charAt(0)}</div>
+            <div className="header-avatar"><User size={18} /></div>
           </div>
         </header>
 

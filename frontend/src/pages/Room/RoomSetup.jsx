@@ -2,37 +2,39 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, Cpu, Users, Globe, Lock, Sparkles, Zap,
-  CheckCircle2, Copy, Plus, Clock, Bot, FlaskConical
+  CheckCircle2, Copy, Plus, Clock, Bot, FlaskConical,
+  Rocket, Briefcase, Coins, Activity, ShieldCheck, User, Leaf
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import './RoomSetup.css';
 import { useAuth } from '../../context/AuthContext';
 
 const PREDEFINED_TOPICS = [
-  { id: 'antigravity', name: 'Antigravity Lab', icon: '🚀', color: '#6366f1', desc: 'Explore propulsion, zero-g environments & future physics.', featured: true },
-  { id: 'tech', name: 'AI & Ethics', icon: '🤖', color: '#8b5cf6', desc: 'Discuss the impact of AGI on society.' },
-  { id: 'climate', name: 'Climate Change', icon: '🌍', color: '#06b6d4', desc: 'Strategies for global carbon reduction.' },
-  { id: 'society', name: 'Remote Work', icon: '💼', color: '#a855f7', desc: 'Is the office model dead?' },
-  { id: 'finance', name: 'Future of DeFi', icon: '⚡', color: '#eab308', desc: 'Decentralized finance vs traditional banking.' },
-  { id: 'health', name: 'Future of Medicine', icon: '🧬', color: '#10b981', desc: 'CRISPR, longevity science, and AI diagnostics.' },
+  { id: 'antigravity', name: 'Antigravity Lab', icon: <Rocket size={24} />, color: '#6366f1', desc: 'Explore propulsion, zero-g environments & future physics.', featured: true },
+  { id: 'tech', name: 'AI & Ethics', icon: <Bot size={24} />, color: '#8b5cf6', desc: 'Discuss the impact of AGI on society.' },
+  { id: 'climate', name: 'Climate Change', icon: <Leaf size={24} />, color: '#06b6d4', desc: 'Strategies for global carbon reduction.' },
+  { id: 'society', name: 'Remote Work', icon: <Briefcase size={24} />, color: '#a855f7', desc: 'Is the office model dead?' },
+  { id: 'finance', name: 'Future of DeFi', icon: <Coins size={24} />, color: '#eab308', desc: 'Decentralized finance vs traditional banking.' },
+  { id: 'health', name: 'Future of Medicine', icon: <Activity size={24} />, color: '#10b981', desc: 'CRISPR, longevity science, and AI diagnostics.' },
 ];
 
 const BOT_PERSONAS = [
   {
     id: 'axiom', codename: 'AXIOM', name: 'Logic Analyst',
     color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.25)',
-    icon: '⬡', desc: 'Data-driven, cites physics constraints, asks probing questions.',
+    icon: <Cpu size={22} />, desc: 'Data-driven, cites physics constraints, asks probing questions.',
     traits: ['Analytical', 'Evidence-based', 'Systematic'],
   },
   {
     id: 'nova', codename: 'NOVA', name: 'Creative Visionary',
     color: '#a855f7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.25)',
-    icon: '✦', desc: 'Wildly imaginative, proposes bold ideas, sparks speculation.',
+    icon: <Sparkles size={22} />, desc: 'Wildly imaginative, proposes bold ideas, sparks speculation.',
     traits: ['Creative', 'Visionary', 'Speculative'],
   },
   {
     id: 'voss', codename: 'VOSS', name: 'Critical Skeptic',
     color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)',
-    icon: '◈', desc: 'Challenges assumptions, demands evidence, keeps ideas grounded.',
+    icon: <ShieldCheck size={22} />, desc: 'Challenges assumptions, demands evidence, keeps ideas grounded.',
     traits: ['Skeptical', 'Pragmatic', 'Incisive'],
   },
 ];
@@ -98,6 +100,10 @@ const RoomSetup = () => {
 
   return (
     <div className="setup-container">
+      <Helmet>
+        <title>Configure Your Discussion | DiscussAI</title>
+        <meta name="description" content="Set up your AI discussion room. Choose your topic, select your AI experts, and prepare for a masterclass in communication." />
+      </Helmet>
       {/* ── Header ── */}
       <div className="setup-header">
         <button onClick={() => navigate('/dashboard')} className="btn-back">
@@ -136,7 +142,7 @@ const RoomSetup = () => {
                 >
                   {t.featured && <span className="featured-tag">⭐ Featured</span>}
                   <div className="topic-icon-wrap" style={{ background: `${t.color}18`, color: t.color }}>
-                    <span style={{ fontSize: '1.4rem' }}>{t.icon}</span>
+                    {t.icon}
                   </div>
                   <h3>{t.name}</h3>
                   <p>{t.desc}</p>
