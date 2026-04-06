@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { 
   Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
   ChevronRight, Check, User, Twitter, Github, Linkedin, Crown, 
-  BarChart3, LogIn, UserPlus 
+  BarChart2, LogIn, UserPlus 
 } from 'lucide-react';
 
 const Home = () => {
@@ -266,7 +266,7 @@ const Home = () => {
           /* Vertical Span */
           <div className="bento-card bento-vertical group border-l-indigo-500/30 reveal stagger-2 hover-lift">
             <div className="bento-icon text-indigo-400 bg-indigo-500/10 border-indigo-500/20" style={{ marginBottom: '1.5rem' }}>
-              <BarChart3 size={24} />
+              <BarChart2 size={24} />
             </div>
             <div className="bento-content bento-content-top">
               <h3 className="bento-title" style={{fontSize: '1.75rem'}}>Analytics Dashboard</h3>
