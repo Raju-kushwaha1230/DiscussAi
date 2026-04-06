@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
-  ChevronRight, Check, User, Twitter, Github, Linkedin, Crown, 
+  ChevronRight, Check, User, TwitterIcon, GithubIcon, LinkedinIcon, Crown, 
   BarChart2, LogIn, UserPlus 
 } from 'lucide-react';
 
@@ -421,9 +421,9 @@ const Home = () => {
               The professional standard for AI-assisted communication and debate practice.
             </p>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-              <a href="#" className="social-link-icon"><Twitter size={18} /></a>
-              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><Github size={18} /></a>
-              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><Linkedin size={18} /></a>
+              <a href="#" className="social-link-icon"><TwitterIcon size={18} /></a>
+              <a href="https://github.com/Raju-kushwaha1230/DiscussAi" className="social-link-icon"><GithubIcon size={18} /></a>
+              <a href="https://www.linkedin.com/in/raju-kushwaha-b2314124b/?skipRedirect=true" className="social-link-icon"><LinkedinIcon size={18} /></a>
             </div>
           </div>
           
