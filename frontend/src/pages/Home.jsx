@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   Bot, Sparkles, MessageSquare, Shield, Rocket, Cpu, Users, 
-  ChevronRight, Check, User, Crown, BarChart2, LogIn, UserPlus 
+  ChevronRight, Check, User, Crown, BarChart2, LogIn, UserPlus, 
+  Zap
 } from 'lucide-react';
 import { FaGithub, FaTwitter, FaLinkedin } from "react-icons/fa";
 
